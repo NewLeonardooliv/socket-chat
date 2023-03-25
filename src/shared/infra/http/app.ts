@@ -1,31 +1,34 @@
-require('dotenv/config');
-import express from "express";
-import path from "path";
+import dotenv from 'dotenv';
+import express, { Application, Request, Response } from 'express';
+import http from 'http';
+import path from 'path';
+import { Server } from 'socket.io';
+import { IMensage } from '../interefaces/IMensage';
 
-const app = express();
-const server = require("http").createServer(app);
-const io = require("socket.io")(server);
+dotenv.config();
 
-app.use(express.static(path.join("./public")));
-app.set("views", path.join("./public"));
-app.engine("html", require("ejs").renderFile);
-app.set("view engine", "html");
+const app: Application = express();
+const server: http.Server = http.createServer(app);
+const io: Server = new Server(server);
 
-app.use("/", (req, res) => {
-    res.render("index.html");
+app.use(express.static(path.join('./public')));
+app.set('views', path.join('./public'));
+app.engine('html', require('ejs').renderFile);
+app.set('view engine', 'html');
+
+app.get('/', (req: Request, res: Response) => {
+    res.render('index.html');
 });
 
-let message = [];
+let messages: IMensage[] = [];
 
-io.on("connection", (socket) => {
-    console.log(`Socket connected: ${socket.id}`);
+io.on('connection', (socket: any) => {
+    socket.emit('previousMessages', messages);
 
-    socket.emit('previousMessages', message)
-
-    socket.on('sendMessage', data => {
-        message.push(data);
+    socket.on('sendMessage', (data: IMensage) => {
+        messages.push(data);
         socket.broadcast.emit('receivedMessage', data);
-    })
+    });
 });
 
 export { server };
