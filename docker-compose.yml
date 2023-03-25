@@ -1,0 +1,12 @@
+version: "3"
+
+services:
+  app:
+    build: .
+    container_name: socket-chat
+    ports:
+      - 3030:3030
+    volumes:
+      - .:/usr/app
+    command: npm run dev
+
