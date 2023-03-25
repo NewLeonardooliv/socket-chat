@@ -1,24 +1,26 @@
 const socket = io(`http://localhost:3030/`);
 
-socket.on("receivedMessage", function (message) {
-  renderMassege(message);
-});
+socket.on("receivedMessage", handleMessageReceived);
+socket.on("previousMessages", handlePreviousMessagesReceived);
 
-socket.on("previousMessages", function (messages) {
+function handleMessageReceived(message) {
+  renderMassege(message, false);
+}
+
+function handlePreviousMessagesReceived(messages) {
   for (message of messages) {
-    renderMassege(message);
+    renderMassege(message, false);
   }
-});
+}
 
 function verifyInputs() {
   const message = document.getElementById("message").value;
 
   if (!message) {
     document.getElementById("send").disabled = true;
-    return;
+  } else {
+    document.getElementById("send").disabled = false;
   }
-
-  document.getElementById("send").disabled = false;
 }
 
 function renderMassege(message, incoming = false) {
@@ -26,28 +28,21 @@ function renderMassege(message, incoming = false) {
   const newMessageElement = document.createElement("div");
   newMessageElement.classList.add("chat-message");
   newMessageElement.classList.add(incoming ? "outgoing" : "incoming");
-  newMessageElement.innerHTML = `<div class="chat-message-content">
-                <p>${message.message}</p>
-                <span class="chat-time">${message.time}</span>
-                </div>`;
+  newMessageElement.innerHTML = `
+  <div class="chat-message-content">
+    <p>${message.message}</p>
+    <span class="chat-time">${message.time}</span>
+  </div>`;
   messagesElement.appendChild(newMessageElement);
 }
 
 function getHoraAtual() {
-  const agora = new Date();
-  let horas = agora.getHours();
-  let minutos = agora.getMinutes().toString().padStart(2, "0");
-  let segundos = agora.getSeconds().toString().padStart(2, "0");
-  let periodo = "AM";
+  const now = new Date();
+  const hours = now.getHours() > 12 ? now.getHours() - 12 : now.getHours();
+  const minutes = now.getMinutes().toString().padStart(2, "0");
+  const period = now.getHours() >= 12 ? "PM" : "AM";
 
-  if (horas > 12) {
-    horas -= 12;
-    periodo = "PM";
-  }
-
-  horas = horas.toString().padStart(2, "0");
-
-  return `${horas}:${minutos} ${periodo}`;
+  return `${hours}:${minutes} ${period}`;
 }
 
 function sendMensage(event) {
@@ -62,5 +57,6 @@ function sendMensage(event) {
     renderMassege(msgObject, true);
     socket.emit("sendMessage", msgObject);
     document.getElementById("message").value = "";
+    verifyInputs();
   }
 }

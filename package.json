@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "ts-node-dev src/shared/infra/http/server.ts",
     "build": "tsc --build",
-    "serve": "node dist/src/shared/infra/http/server.js"
+    "serve": "node dist/src/shared/infra/http/server.js",
+    "prod": "tsc --build && node dist/src/shared/infra/http/server.js"
   },
   "keywords": [],
   "author": "",

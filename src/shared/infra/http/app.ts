@@ -3,7 +3,7 @@ import express, { Application, Request, Response } from 'express';
 import http from 'http';
 import path from 'path';
 import { Server } from 'socket.io';
-import { IMessage } from '../interefaces/IMensage';
+import { IMessage } from '../interefaces/IMessage';
 
 dotenv.config();
 
