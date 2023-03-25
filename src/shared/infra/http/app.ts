@@ -3,7 +3,7 @@ import express, { Application, Request, Response } from 'express';
 import http from 'http';
 import path from 'path';
 import { Server } from 'socket.io';
-import { IMensage } from '../interefaces/IMensage';
+import { IMessage } from '../interefaces/IMensage';
 
 dotenv.config();
 
@@ -20,12 +20,12 @@ app.get('/', (req: Request, res: Response) => {
     res.render('index.html');
 });
 
-let messages: IMensage[] = [];
+let messages: IMessage[] = [];
 
 io.on('connection', (socket: any) => {
     socket.emit('previousMessages', messages);
 
-    socket.on('sendMessage', (data: IMensage) => {
+    socket.on('sendMessage', (data: IMessage) => {
         messages.push(data);
         socket.broadcast.emit('receivedMessage', data);
     });
